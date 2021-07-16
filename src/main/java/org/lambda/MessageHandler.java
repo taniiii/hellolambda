@@ -8,11 +8,11 @@ import com.google.gson.GsonBuilder;
 
 import java.util.*;
 
-public class MessageHandler implements RequestHandler<Map<String, String>, String> {
+public class MessageHandler implements RequestHandler<Map<String, String>, Map<String, String>> {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     @Override
-    public String handleRequest(Map<String, String> jsonMessage, Context context) {
+    public Map<String, String> handleRequest(Map<String, String> jsonMessage, Context context) {
 
         LambdaLogger logger = context.getLogger();
         logger.log("EVENT: " + GSON.toJson(jsonMessage));
@@ -20,12 +20,11 @@ public class MessageHandler implements RequestHandler<Map<String, String>, Strin
         return validateJson(jsonMessage);
     }
 
-    private static String validateJson(Map<String, String> message){
+    private static Map<String, String> validateJson(Map<String, String> message){
 
         if(!message.containsKey("message") || "".equals(message.get("message"))){
 
-            return GSON.toJson(
-                    Map.of("error", "Field message can not be null or empty"));
+            return Map.of("error", "Field message can not be null or empty");
         }
 
         StringBuilder sb = new StringBuilder();
@@ -35,6 +34,6 @@ public class MessageHandler implements RequestHandler<Map<String, String>, Strin
             sb.append(temp.charAt(i));
         }
 
-        return GSON.toJson(Map.of("message", sb.toString()));
+        return Map.of("message", sb.toString());
     }
 }
